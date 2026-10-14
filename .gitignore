@@ -1,0 +1,47 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.DS_Store
+.idea/
+.vscode/
+
+# Large sample docs are downloaded on demand, never committed
+examples/_large/
+
+# Local secrets
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local backups and data
+*.bak
+*.pre_daily
+*.backup
+*.sql
+*.dump
+*.sqlite3
+*.db
+cisco_manual.pdf
+
+# Logs
+*.log
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Development backups
+*.pre_redis
+*.pre_*
+
+# Unverified sample PDF
+examples/onboarding-guide.pdf
