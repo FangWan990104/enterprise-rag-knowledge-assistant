@@ -37,11 +37,13 @@ def client(monkeypatch):
         lambda: SimpleNamespace(top_k=4, min_relevance=0.12),
     )
 
+    monkeypatch.setattr(query_module, "get_cache", lambda key: None)
+    monkeypatch.setattr(query_module, "set_cache", lambda key, value: None)
+
+    monkeypatch.setattr("app.main.check_daily_quota", lambda: True)
+
     def _fake_db():
-        from unittest.mock import MagicMock
-        fake_db = MagicMock()
-        fake_db.execute.return_value.one.return_value = (0, 0)
-        yield fake_db
+        yield SimpleNamespace(execute=lambda *args, **kwargs: SimpleNamespace(one=lambda: (0,)))
 
     app.dependency_overrides[get_db] = _fake_db
     yield TestClient(app)
@@ -124,3 +126,13 @@ def test_stream_emits_answer_text_then_a_citations_frame(client, monkeypatch):
     assert answer == "You have 30 days."       # streamed tokens, concatenated
     citations = json.loads(frame)["citations"]  # trailing JSON parses
     assert citations[0]["document_title"] == "Handbook"
+
+
+def test_cache_key_changes_with_revision():
+    import hashlib
+    import json
+    question = "What is GitLab handbook-first?"
+    def key(revision):
+        payload = [question, 3, [revision]]
+        return "rag:query:" + hashlib.sha256(json.dumps(payload, ensure_ascii=False).encode()).hexdigest()
+    assert key(1) != key(2)

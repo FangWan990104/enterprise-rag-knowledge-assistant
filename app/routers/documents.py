@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.security import require_admin
 from app.database import get_db
 from app.models import Chunk, Document
 from app.schemas import DocumentSummary, IngestRequest, IngestResponse
@@ -37,7 +38,7 @@ def _to_response(document) -> IngestResponse:
     )
 
 
-@router.post("", response_model=IngestResponse, status_code=201)
+@router.post("", response_model=IngestResponse, status_code=201, dependencies=[Depends(require_admin)])
 def create_document(payload: IngestRequest, db: Session = Depends(get_db)):
     """Ingest a raw-text document."""
     try:
@@ -47,7 +48,7 @@ def create_document(payload: IngestRequest, db: Session = Depends(get_db)):
     return _to_response(document)
 
 
-@router.post("/upload", response_model=IngestResponse, status_code=201)
+@router.post("/upload", response_model=IngestResponse, status_code=201, dependencies=[Depends(require_admin)])
 async def upload_document(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ):

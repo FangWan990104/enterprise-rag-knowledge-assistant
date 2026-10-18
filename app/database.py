@@ -35,6 +35,10 @@ def init_db() -> None:
 
     Base.metadata.create_all(bind=engine)
 
+    with engine.begin() as conn:
+        conn.execute(text("CREATE TABLE IF NOT EXISTS knowledge_base_revision (id INTEGER PRIMARY KEY CHECK (id = 1), revision BIGINT NOT NULL DEFAULT 0)"))
+        conn.execute(text("INSERT INTO knowledge_base_revision (id, revision) VALUES (1, 0) ON CONFLICT (id) DO NOTHING"))
+
     # HNSW index for fast approximate nearest-neighbour search at scale.
     # pgvector's HNSW index supports at most 2000 dimensions; above that we keep
     # the column (exact search) but skip the index.

@@ -39,9 +39,7 @@ logs/
 __pycache__/
 *.pyc
 
-# Development backups
-*.pre_redis
+# Local development snapshots
+*.before_*
+*.before_upload
 *.pre_*
-
-# Unverified sample PDF
-examples/onboarding-guide.pdf

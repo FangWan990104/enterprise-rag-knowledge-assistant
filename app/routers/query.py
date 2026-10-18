@@ -49,7 +49,7 @@ def query(payload: QueryRequest, db: Session = Depends(get_db)):
     """Retrieve relevant context and answer with inline citations."""
     settings = get_settings()
     top_k = payload.top_k or settings.top_k
-    revision = db.execute(text("SELECT COALESCE(MAX(id), 0), COUNT(*) FROM documents")).one()
+    revision = db.execute(text("SELECT revision FROM knowledge_base_revision WHERE id = 1")).one()
     cache_key = "rag:query:" + hashlib.sha256(json.dumps([payload.question, top_k, list(revision)], ensure_ascii=False).encode()).hexdigest()
     cached = get_cache(cache_key)
     if cached is not None:
